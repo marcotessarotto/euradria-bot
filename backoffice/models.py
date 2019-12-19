@@ -1,6 +1,6 @@
 from django.db import models
 
-from backoffice.definitions import UI_telegram_user, UI_telegram_users
+from backoffice.definitions import UI_telegram_user, UI_telegram_users, UI_log_of_interactions_between_bot_and_users
 
 APP_LABEL = "backoffice"  # DO NOT MODIFY; necessary to telegram bot for import of django models
 
@@ -76,6 +76,27 @@ class AiAction(models.Model):
             return f"{self.id} - {self.action} ({self.description})"
         else:
             return f"{self.id} - {self.action} "
+
+
+class LogUserInteraction(models.Model):  # was CommandsFromUser
+    # telegramUser = models.ForeignKey(TelegramUser, on_delete=models.PROTECT)
+    user_id = models.BigIntegerField(verbose_name="telegram user id", default=-1)  # Telegram used id
+
+    text = models.CharField(max_length=1024)
+
+    # if true, command
+    coming_from_user = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = UI_log_of_interactions_between_bot_and_users
+        verbose_name_plural = UI_log_of_interactions_between_bot_and_users
+        app_label = APP_LABEL
+
+    def __str__(self):
+        return f"LogUserInteraction: user_id={self.user_id} coming_from_user={self.coming_from_user}  {self.created_at}  {self.text}"
 
 
 class NaiveSentenceSimilarityDb(models.Model):

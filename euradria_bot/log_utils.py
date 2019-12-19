@@ -28,6 +28,11 @@ logging.Formatter.converter = custom_time_converter
 main_logger = logging.getLogger('euradria_bot')  # "main" logger
 main_logger.setLevel(logging.INFO)
 
+
+orm_logger = logging.getLogger('ormlayer')
+orm_logger.setLevel(logging.DEBUG)
+
+
 benchmark_logger = logging.getLogger('benchmark')
 benchmark_logger.setLevel(logging.DEBUG)
 
@@ -57,14 +62,36 @@ def benchmark_decorator(func):
     return wrapped
 
 
+def log_user_input(func):  # https://github.com/python-telegram-bot/python-telegram-bot/wiki/Code-snippets#advanced-snippets
+    @wraps(func)
+    def wrapped(update, context, *args, **kwargs):
+        user_id = update.effective_user.id
 
-# def debug_update(func):
-#     @wraps(func)
-#     def wrapped(update, context, *args, **kwargs):
-#         if EXT_DEBUG_MSG:
-#             main_logger.debug(f"debug_update {func.__name__}:")
-#             my_print(update, 4, main_logger)
-#         return func(update, context, *args, **kwargs)
-#     return wrapped
+        # print(f"log_user_input: user_id={user_id}")
+        try:
+            text = update.message.text
+        except AttributeError:
+            text = "?"
+
+        from backoffice.models import LogUserInteraction
+        cfu = LogUserInteraction()
+        cfu.coming_from_user = True
+        cfu.text = text
+        cfu.user_id = user_id
+        cfu.save()
+
+        return func(update, context, *args, **kwargs)
+    return wrapped
+
+
+
+def debug_update(func):
+    @wraps(func)
+    def wrapped(update, context, *args, **kwargs):
+        # if EXT_DEBUG_MSG:
+        #     main_logger.debug(f"debug_update {func.__name__}:")
+        #     my_print(update, 4, main_logger)
+        return func(update, context, *args, **kwargs)
+    return wrapped
 
 

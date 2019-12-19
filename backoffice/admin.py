@@ -100,3 +100,9 @@ class TelegramUserAdmin(admin.ModelAdmin, ExportCsvMixin):
     }
 
 
+@admin.register(LogUserInteraction)
+class CommandsFromUserAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'coming_from_user', 'created_at', 'text')
+    search_fields = ('user_id', )
+
+
