@@ -127,3 +127,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+secrets.py
+
+ultima_newsletter.pdf
+
+secret_readme.txt
+
+db.sqlite3
+
+token.txt
+
+token.txt
+
+vacancies.txt
+
+reserved_notes.txt
+
